@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000"; // adjust if deployed
+const API_URL = "https://rick-and-morty-api-oh0e.onrender.com/"; // adjust if deployed
 
 
 document.getElementById("searchBtn")?.addEventListener("click", async () => {
