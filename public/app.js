@@ -1,5 +1,4 @@
-const API_URL = "https://rick-and-morty-api-oh0e.onrender.com/"; // adjust if deployed
-
+const API_URL = "https://rick-and-morty-api-oh0e.onrender.com/"; 
 
 document.getElementById("searchBtn")?.addEventListener("click", async () => {
     const name = document.getElementById("searchName").value.trim();
