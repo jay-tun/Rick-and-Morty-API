@@ -64,22 +64,32 @@ async function loadCharacters() {
     const card = document.createElement("div");
     card.className = "character-card";
 
+    // check if already has backstory
+    const hasBackstory = !!c.backstory;
+
     card.innerHTML = `
-    ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ''}
-    <h3>${capitalizeWords(c.name)}</h3>
-    <p><strong>Species:</strong> ${capitalizeWords(c.species) || "Unknown"}</p>
-    <p><strong>Origin:</strong> ${capitalizeWords(c.origin) || "Unknown"}</p>
-    <p><strong>Gender:</strong> ${capitalizeWords(c.gender) || "Unknown"}</p>
-    <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
-    <p><strong>Backstory:</strong> <span id="backstory-${c.id}">${c.backstory || "No backstory yet"}</span></p>
-    <button class="backstory-btn" data-id="${c.id}">Generate Backstory</button>
-    <button class="chat-btn" data-id="${c.id}">Chat with Character</button>
-    <div id="chat-container-${c.id}" class="chat-container" style="display:none; margin-top:10px;">
-      <div id="chat-messages-${c.id}" class="chat-messages" style="border:1px solid #ccc; padding:5px; height:100px; overflow-y:auto; margin-bottom:5px;"></div>
-      <input type="text" id="chat-input-${c.id}" placeholder="Say something..." style="width:70%; padding:5px;">
-      <button id="chat-send-${c.id}">Send</button>
-    </div>
-  `;
+        ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ''}
+        <h3>${capitalizeWords(c.name)}</h3>
+        <p><strong>Species:</strong> ${capitalizeWords(c.species) || "Unknown"}</p>
+        <p><strong>Origin:</strong> ${capitalizeWords(c.origin) || "Unknown"}</p>
+        <p><strong>Gender:</strong> ${capitalizeWords(c.gender) || "Unknown"}</p>
+        <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
+        <p><strong>Backstory:</strong> <span id="backstory-${c.id}">${c.backstory || "No backstory yet"}</span></p>
+        
+        <button class="backstory-btn" data-id="${c.id}" ${hasBackstory ? "disabled" : ""} >
+            ${hasBackstory ? "Backstory Generated" : "Generate Backstory"}
+        </button>
+        <button class="chat-btn" data-id="${c.id}" data-name="${capitalizeWords(c.name)}">Chat with Character</button>
+        <button class="analyze-btn" data-id="${c.id}">Analyze Personality</button>
+
+        <div id="chat-container-${c.id}" class="chat-container" style="display:none; margin-top:10px;">
+        <div id="chat-messages-${c.id}" class="chat-messages" style="border:1px solid #ccc; padding:5px; height:100px; overflow-y:auto; margin-bottom:5px;"></div>
+        <input type="text" id="chat-input-${c.id}" placeholder="Say something..." style="width:70%; padding:5px;">
+        <button id="chat-send-${c.id}">Send</button>
+        </div>
+
+        <div id="analysis-${c.id}" class="analysis-box"></div>
+    `;
 
     container.appendChild(card);
   });
@@ -115,6 +125,7 @@ document.getElementById("charForm")?.addEventListener("submit", async (e) => {
 
 
 document.addEventListener("click", async (e) => {
+  // 🔹 Backstory button
   if (e.target.classList.contains("backstory-btn")) {
     const characterId = e.target.dataset.id;
     const token = localStorage.getItem("token");
@@ -136,16 +147,20 @@ document.addEventListener("click", async (e) => {
     e.target.disabled = false;
     e.target.innerText = "Generate Backstory";
   }
-  // Chat button
+
+  // 🔹 Chat button (toggle chat container)
   if (e.target.classList.contains("chat-btn")) {
     const characterId = e.target.dataset.id;
     const chatContainer = document.getElementById(`chat-container-${characterId}`);
     chatContainer.style.display = chatContainer.style.display === "none" ? "block" : "none";
   }
 
-  // Send chat message
+  // 🔹 Send chat message
   if (e.target.id.startsWith("chat-send-")) {
     const characterId = e.target.id.replace("chat-send-", "");
+    const chatButton = document.querySelector(`.chat-btn[data-id='${characterId}']`);
+    const characterName = chatButton.dataset.name;
+
     const input = document.getElementById(`chat-input-${characterId}`);
     const messagesDiv = document.getElementById(`chat-messages-${characterId}`);
     const message = input.value.trim();
@@ -165,10 +180,40 @@ document.addEventListener("click", async (e) => {
     });
 
     const data = await res.json();
-    messagesDiv.innerHTML += `<div><strong>${capitalizeWords(characterId)}:</strong> ${data.reply}</div>`;
+    messagesDiv.innerHTML += `<div><strong>${characterName}:</strong> ${data.reply}</div>`;
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
+
+  // 🔹 Analyze personality button
+  if (e.target.classList.contains("analyze-btn")) {
+    const characterId = e.target.dataset.id;
+    const analysisDiv = document.getElementById(`analysis-${characterId}`);
+    const token = localStorage.getItem("token");
+
+    analysisDiv.innerHTML = "<em>Analyzing personality...</em>";
+
+    try {
+      const res = await fetch(`${API_URL}/ai/personality`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ characterId }),
+      });
+      const data = await res.json();
+
+      if (data.personality) {
+        analysisDiv.innerHTML = `<pre>${data.personality}</pre>`;
+      } else {
+        analysisDiv.innerHTML = `<span style="color:red;">Error analyzing personality.</span>`;
+      }
+    } catch (err) {
+      analysisDiv.innerHTML = `<span style="color:red;">Failed to fetch analysis.</span>`;
+    }
+  }
 });
+
 
 // Logout
 function logout() {

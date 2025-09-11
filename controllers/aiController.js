@@ -57,15 +57,15 @@ const generateBackstory = async (req, res) => {
 /** Character Relationship Predictor */
 const suggestRelationships = async (req, res) => {
   try {
-    const { char1Id, char2Id } = req.body;
-    if (!char1Id || !char2Id)
+    const { char1Name, char2Name } = req.body;
+    if (!char1Name || !char2Name)
       return res.status(400).json({ error: "Need two character IDs" });
 
     const res1 = await pool.query("SELECT * FROM characters WHERE id = $1", [
-      char1Id,
+      char1Name,
     ]);
     const res2 = await pool.query("SELECT * FROM characters WHERE id = $1", [
-      char2Id,
+      char2Name,
     ]);
     if (!res1.rows[0] || !res2.rows[0])
       return res

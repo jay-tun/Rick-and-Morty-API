@@ -110,3 +110,22 @@ input, button {
 .character-card strong {
   color: #2c3e50;
 }
+
+.chat-container input {
+  margin-right: 5px;
+}
+.chat-messages {
+  background: #f9f9f9;
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 0.9rem;
+}
+
+.analysis-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: #eef6ff;
+  border-radius: 6px;
+  font-family: monospace;
+  white-space: pre-wrap;
+}
