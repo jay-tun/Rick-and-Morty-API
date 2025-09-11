@@ -89,6 +89,13 @@ Copy the `token` from response.
     -H "Content-Type: application/json" \
     -d '{"characterId": 1}'
 
+#### Episodes Recommendation
+
+    curl -X POST http://localhost:3000/ai/episodes \
+    -H "Authorization: Bearer YOUR_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{"characterId": 1}'
+
 #### Chat with Character
     
     curl -X POST http://localhost:3000/ai/chat \
