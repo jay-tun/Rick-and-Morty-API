@@ -165,19 +165,28 @@ const analyzePersonality = async (req, res) => {
 /** Episode Recommendations */
 const recommendEpisodes = async (req, res) => {
   try {
-    const { characterId } = req.body;
-    const result = await pool.query("SELECT * FROM characters WHERE id = $1", [
-      characterId,
-    ]);
-    if (result.rows.length === 0)
-      return res.status(404).json({ error: "Character not found" });
+    const { characterId, characterData } = req.body;
+    let char;
 
-    const char = result.rows[0];
-    const prompt = `Suggest 3 Rick and Morty episodes that best match this character's backstory and traits.
-                    Character: ${char.name},
-                    Species: ${char.species},
-                    Origin: ${char.origin},
-                    Backstory: ${char.backstory}`;
+    if (characterId) {
+      const result = await pool.query("SELECT * FROM characters WHERE id = $1", [characterId]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: "Character not found" });
+      }
+      char = result.rows[0];
+    } else if (characterData) {
+      char = characterData;
+    } else {
+      return res.status(400).json({ error: "Missing characterId or characterData" });
+    }
+
+    const prompt = `
+    Suggest 3 Rick and Morty episodes that best match this character's traits and backstory.
+    Character: ${char.name}
+    Species: ${char.species}
+    Origin: ${char.origin?.name || char.origin}
+    Backstory: ${char.backstory || "No backstory provided"}
+    `;
 
     const response = await openai.chat.completions.create({
       model: model,
@@ -186,11 +195,10 @@ const recommendEpisodes = async (req, res) => {
     });
 
     res.json({
-      characterId,
-      recommendations: response.choices[0].message.content,
+      recommendations: response.choices[0].message.content.trim(),
     });
   } catch (err) {
-    console.error(err);
+    console.error("Episode recommendation error:", err);
     res.status(500).json({ error: "AI episode recommendation failed" });
   }
 };
