@@ -14,25 +14,25 @@
 ---
 
 ## 📦 Setup
-1. Clone repo:
+#### 1. Clone repo:
    ```
    git clone https://github.com/jay-tun/Rick-and-Morty-API.git
    cd Rick-and-Morty-API
    ```
 
-2. Install dependencies:
+#### 2. Install dependencies:
     ```
     npm install
     ```
 
-3. Configure `.env`:
+#### 3. Configure `.env`:
     ```
     DATABASE_URL=postgresql://postgres:[password]@host:5432/postgres
     JWT_SECRET=supersecret
     GITHUB_TOKEN=ghp_yourkey
     PORT=3000
     ```
-4. Setup database in Supabase (PostgreSQL):
+#### 4. Setup database in Supabase (PostgreSQL):
     ```
     CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -75,14 +75,14 @@ The API will be available at http://localhost:3000.
 
 ## 🔍 Test API
 
-# Register
+#### Register
     ```
     curl -X POST http://localhost:3000/auth/register \
     -H "Content-Type: application/json" \
     -d '{"email":"test@test.com","password":"123"}'
     ```
 
-# Login
+#### Login
     ```
     curl -X POST http://localhost:3000/auth/login \
     -H "Content-Type: application/json" \
@@ -91,7 +91,7 @@ The API will be available at http://localhost:3000.
 
 Copy the `token` from response.
 
-# Generate Backstory
+#### Generate Backstory
     ```
     curl -X POST http://localhost:3000/ai/backstory \
     -H "Authorization: Bearer YOUR_TOKEN" \
@@ -99,7 +99,7 @@ Copy the `token` from response.
     -d '{"characterId": 1}'
     ```
 
-# Chat with Character
+#### Chat with Character
     ```
     curl -X POST http://localhost:3000/ai/chat \
     -H "Authorization: Bearer YOUR_TOKEN" \
