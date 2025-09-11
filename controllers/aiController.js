@@ -59,55 +59,45 @@ const suggestRelationships = async (req, res) => {
   try {
     const { char1Name, char2Name } = req.body;
     if (!char1Name || !char2Name)
-      return res.status(400).json({ error: "Need two character IDs" });
+      return res.status(400).json({ error: "Both character names are required" });
 
-    const res1 = await pool.query(
-      "SELECT * FROM characters WHERE LOWER(name) = LOWER($1) LIMIT 1",
-      [char1Name]
-    );
-    const res2 = await pool.query(
-      "SELECT * FROM characters WHERE LOWER(name) = LOWER($1) LIMIT 1",
-      [char2Name]
-    );
+    // Fetch characters by name
+    const result1 = await pool.query("SELECT * FROM characters WHERE name ILIKE $1", [char1Name]);
+    const result2 = await pool.query("SELECT * FROM characters WHERE name ILIKE $1", [char2Name]);
 
-    const char1 = res1.rows[0];
-    const char2 = res2.rows[0];
+    if (!result1.rows[0] || !result2.rows[0])
+      return res.status(404).json({ error: "One or both characters not found" });
 
-    if (!char1 || !char2)
-      return res
-        .status(404)
-        .json({ error: "One or both characters not found" });
+    const char1 = result1.rows[0];
+    const char2 = result2.rows[0];
 
-    const text1 = `${char1.name}, ${char1.species}, ${char1.backstory || ""}`;
-    const text2 = `${char2.name}, ${char2.species}, ${char2.backstory || ""}`;
+    const text1 = `${char1.name} ${char1.species} ${char1.backstory || ""}`;
+    const text2 = `${char2.name} ${char2.species} ${char2.backstory || ""}`;
 
+    // Get embeddings
     const [embed1, embed2] = await Promise.all([
-      openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: text1,
-      }),
-      openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: text2,
-      }),
+      openai.embeddings.create({ model: "text-embedding-3-small", input: text1 }),
+      openai.embeddings.create({ model: "text-embedding-3-small", input: text2 }),
     ]);
-    const v1 = embed1.data[0].embedding;
-    const v2 = embed2.data[0].embedding;
 
+    let v1 = embed1.data[0].embedding;
+    let v2 = embed2.data[0].embedding;
+
+    // Cosine similarity
     const cosineSim = (a, b) => {
-      let dot = 0,
-        magA = 0,
-        magB = 0;
+      let dot = 0, magA = 0, magB = 0;
       for (let i = 0; i < a.length; i++) {
         dot += a[i] * b[i];
         magA += a[i] ** 2;
         magB += b[i] ** 2;
       }
+      //if (magA === 0 || magB === 0) return 0;
       return dot / (Math.sqrt(magA) * Math.sqrt(magB));
     };
 
     const similarity = cosineSim(v1, v2);
 
+    // Map similarity to relationship
     let relationship = "Acquaintances";
     if (similarity > 0.9) relationship = "Family / Very Close Friends";
     else if (similarity > 0.75) relationship = "Close Friends / Allies";
@@ -119,6 +109,7 @@ const suggestRelationships = async (req, res) => {
       char2: char2.name,
       similarity: similarity.toFixed(3),
       relationship,
+      message: `Suggested relationship between ${char1.name} and ${char2.name}: ${relationship} (similarity: ${similarity.toFixed(3)})`
     });
   } catch (err) {
     console.error("Relationship predictor error:", err);
