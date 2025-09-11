@@ -12,6 +12,7 @@ const aiRoutes = require("./routes/ai");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 app.get("/", (req, res) => {
     res.send("Rick and Morty API is running!");

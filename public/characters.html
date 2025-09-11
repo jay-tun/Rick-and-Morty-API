@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rick & Morty Characters</title>
+</head>
+<body>
+  <h1>Characters</h1>
+  <button onclick="logout()">Logout</button>
+
+  <h2>Add Character</h2>
+  <form id="charForm">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="species" placeholder="Species">
+    <input type="text" id="status" placeholder="Status">
+    <input type="text" id="gender" placeholder="Gender">
+    <input type="text" id="origin" placeholder="Origin">
+    <button type="submit">Add Character</button>
+  </form>
+
+  <h2>Character List</h2>
+  <ul id="characterList"></ul>
+
+  <script src="app.js"></script>
+</body>
+</html>
