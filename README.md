@@ -15,12 +15,14 @@
 
 ## 📦 Setup
 #### 1. Clone repo:
+
    ```
    git clone https://github.com/jay-tun/Rick-and-Morty-API.git
    cd Rick-and-Morty-API
    ```
 
 #### 2. Install dependencies:
+
     ```
     npm install
     ```
