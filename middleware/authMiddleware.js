@@ -6,7 +6,7 @@ function authMiddleware(req, res, next) {
   if (!authHeader) return res.status(401).json({ error: "No token provided!" });
 
   const parts = authHeader.split(" ");
-  if (parts !== 2) return res.status(401).json({ error: " Token Error!" });
+  if (parts.length !== 2) return res.status(401).json({ error: " Token Error!" });
 
   const [scheme, token] = parts;
   if (!/^Bearer$/i.test(scheme))

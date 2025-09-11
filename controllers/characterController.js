@@ -2,13 +2,11 @@ const pool = require("../db");
 const axios = require("axios");
 
 const getAll = async (req, res) => {
+  const userId = req.user.id;
   try {
-    const q = `SELECT c.*, u.email as created_by_email
-               FROM characters c
-               LEFT JOIN users u ON c.created_by = u.id
-               ORDER BY created_at DESC`;
-    const result = await pool.query(q);
-    res.json(result.rows);
+    const q = `SELECT * FROM characters WHERE created_by = $1 ORDER BY created_at DESC`;
+    const result = await pool.query(q, [userId]);
+    res.json({ characters: result.rows });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

@@ -39,21 +39,26 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
 // Fetch Characters
 async function loadCharacters() {
-  const res = await fetch(`${API_URL}/characters`);
-  const chars = await res.json();
-  const list = document.getElementById("characterList");
-  if (list) {
-    list.innerHTML = "";
-    chars.forEach((c) => {
-      const li = document.createElement("li");
-      li.textContent = `${c.name} (${c.species})`;
-      list.appendChild(li);
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_URL}/characters`, {
+        headers: { Authorization: `Bearer ${token}` }, // <- include JWT
     });
+    const data = await res.json();
+    const list = document.getElementById("characterList");
+    if (list) {
+        list.innerHTML = "";
+        data.characters.forEach((c) => {
+        const li = document.createElement("li");
+        li.textContent = `${c.name} (${c.species})`;
+        list.appendChild(li);
+        });
   }
 }
+
+
 if (document.getElementById("characterList")) loadCharacters();
 
-// ➕ Add Character
+// Add Character
 document.getElementById("charForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const token = localStorage.getItem("token");
@@ -78,7 +83,7 @@ document.getElementById("charForm")?.addEventListener("submit", async (e) => {
   loadCharacters();
 });
 
-// 🚪 Logout
+// Logout
 function logout() {
   localStorage.removeItem("token");
   window.location.href = "index.html";
