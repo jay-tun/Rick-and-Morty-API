@@ -15,7 +15,7 @@ document.getElementById("registerForm")?.addEventListener("submit", async (e) =>
   document.getElementById("message").innerText = JSON.stringify(data);
 });
 
-// 🔑 Login
+// Login
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("loginEmail").value;
@@ -30,13 +30,14 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
 
   if (data.token) {
     localStorage.setItem("token", data.token);
-    window.location.href = "characters.html"; // go to characters page
+    window.location.href = "characters.html";
   } else {
-    document.getElementById("message").innerText = data.error || "Login failed!";
+    // show either error or message
+    document.getElementById("message").innerText = data.error || data.message || "Login failed!";
   }
 });
 
-// 📋 Fetch Characters
+// Fetch Characters
 async function loadCharacters() {
   const res = await fetch(`${API_URL}/characters`);
   const chars = await res.json();

@@ -38,6 +38,9 @@ const login = async (req, res) => {
       "SELECT id, email, password FROM users WHERE email = $1",
       [email],
     );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "We don't have you in our system. Please register." });
+    }
     const user = result.rows[0];
     if (!user) return res.status(401).json({ error: "Invalid credentials!" });
 
