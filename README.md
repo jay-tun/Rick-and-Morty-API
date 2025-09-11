@@ -92,10 +92,17 @@ The API will be available at http://localhost:3000.
 Copy the `token` from response.
 
 # Generate Backstory
-
     ```
     curl -X POST http://localhost:3000/ai/backstory \
     -H "Authorization: Bearer YOUR_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"characterId": 1}'
+    ```
+
+# Chat with Character
+    ```
+    curl -X POST http://localhost:3000/ai/chat \
+    -H "Authorization: Bearer YOUR_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{"characterId": 1, "message": "How's your school, Morty?"}'
     ```
