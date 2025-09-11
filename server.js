@@ -7,6 +7,7 @@ dotenv.config();
 const authRoutes = require("./routes/auth");
 const characterRoutes = require("./routes/characters");
 const externalRoutes = require("./routes/external");
+const aiRoutes = require("./routes/ai");
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/characters", characterRoutes);
 app.use("/external", externalRoutes);
+app.use("/ai", aiRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
