@@ -1,104 +1,77 @@
-# Rick & Morty AI Backend
+# Overview
 
-## 🚀 Features
-- User auth (register/login via JWT)
-- Characters CRUD
-- External API proxy (Rick & Morty API)
-- AI Features:
-  - Backstory generation
-  - Personality analysis (Big Five)
-  - Episode recommendations
-  - Relationship predictor (embeddings)
-  - In-character chatbot
+This is a Rick & Morty AI Backend application that combines a RESTful API with AI-powered features. The system allows users to manage custom characters, search the external Rick & Morty API, and interact with AI features like backstory generation, personality analysis, episode recommendations, and character chatbots. Built with Node.js and Express, it features JWT authentication, PostgreSQL database integration, and OpenAI API integration through GitHub's model inference service.
 
----
+# User Preferences
 
-## 📦 Setup
-#### 1. Clone repo:
+Preferred communication style: Simple, everyday language.
 
-    git clone https://github.com/jay-tun/Rick-and-Morty-API.git
-    cd Rick-and-Morty-API
+# System Architecture
 
-#### 2. Install dependencies:
+## Backend Architecture
+- **Framework**: Express.js with Node.js runtime
+- **Architecture Pattern**: RESTful API with modular route-controller structure
+- **File Organization**: Separated concerns with dedicated folders for routes, controllers, middleware, and database connection
+- **Authentication**: JWT-based stateless authentication with bcrypt password hashing
+- **Middleware**: Custom authentication middleware for protected routes
 
-    npm install
-    
-#### 3. Configure `.env`:
-    
-    DATABASE_URL=postgresql://postgres:[password]@host:5432/postgres
-    JWT_SECRET=supersecret
-    GITHUB_TOKEN=ghp_yourkey
-    PORT=3000
-    
-#### 4. Setup database in Supabase (PostgreSQL):
-    
-    CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
-    );
+## Database Design
+- **Database**: PostgreSQL with connection pooling via node-postgres (pg)
+- **Schema**: Two main tables - users (authentication) and characters (user-created content)
+- **User Table**: Basic user management with email/password and timestamps
+- **Character Table**: Flexible character storage with optional fields for species, status, gender, origin, image, and AI-generated backstory
+- **Security**: SSL-enabled database connections with environment-based configuration
 
-    CREATE TABLE characters (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    species TEXT,
-    status TEXT,
-    gender TEXT,
-    origin TEXT,
-    image TEXT,
-    backstory TEXT,
-    created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT NOW()
-    );
+## API Structure
+- **Authentication Routes** (`/auth`): User registration and login
+- **Character Routes** (`/characters`): CRUD operations for user-created characters (protected)
+- **External API Routes** (`/external`): Proxy to Rick & Morty API for character search
+- **AI Routes** (`/ai`): AI-powered features including backstory generation, personality analysis, and chatbot functionality (protected)
 
----
+## AI Integration
+- **Provider**: OpenAI models accessed through GitHub's model inference service
+- **Model**: GPT-4.1 for text generation tasks
+- **Features**: Backstory generation, Big Five personality analysis, episode recommendations, relationship predictions, and in-character chatbot interactions
+- **Flexibility**: Supports both user-created characters and external API characters for AI operations
 
-## ▶️ Run server
+## Frontend Architecture
+- **Technology**: Vanilla JavaScript with HTML/CSS
+- **Structure**: Static file serving from public directory
+- **Pages**: Login/registration page and character management interface
+- **API Communication**: Fetch API for backend communication with JWT token handling
+- **UI Features**: Character search, CRUD operations, and AI feature integration
 
-    npm run start
+## Security Implementation
+- **Authentication**: JWT tokens with configurable secret
+- **Password Security**: bcrypt hashing with salt rounds
+- **Route Protection**: Middleware-based authentication for sensitive endpoints
+- **CORS**: Enabled for cross-origin requests
+- **Input Validation**: Basic validation for required fields and data types
 
-Or in dev mode after installing `npm install nodemon` (Recommended)
+# External Dependencies
 
-    npm run dev
+## Core Backend Dependencies
+- **express**: Web framework for API routing and middleware
+- **pg**: PostgreSQL client for database operations with connection pooling
+- **jsonwebtoken**: JWT token generation and verification for authentication
+- **bcrypt**: Password hashing and verification
+- **cors**: Cross-origin resource sharing middleware
+- **dotenv**: Environment variable management
 
-The API will be available at http://localhost:3000.
+## AI and External Services
+- **openai**: OpenAI SDK configured to use GitHub's model inference service
+- **axios**: HTTP client for external API requests to Rick & Morty API
 
----
+## Database Service
+- **PostgreSQL**: Primary database, configured for Supabase hosting
+- **Connection**: SSL-enabled connection with environment-based configuration
 
-## 🔍 Test API
+## External APIs
+- **Rick & Morty API**: Public API for character data at rickandmortyapi.com
+- **GitHub Models API**: AI model inference service using OpenAI GPT-4.1
 
-#### Register
-    
-    curl -X POST http://localhost:3000/auth/register \
-    -H "Content-Type: application/json" \
-    -d '{"email":"test@test.com","password":"123"}'
-
-#### Login
-    
-    curl -X POST http://localhost:3000/auth/login \
-    -H "Content-Type: application/json" \
-    -d '{"email":"test@test.com","password":"123"}'
-
-Copy the `token` from response.
-
-#### Generate Backstory
-    
-    curl -X POST http://localhost:3000/ai/backstory \
-    -H "Authorization: Bearer YOUR_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{"characterId": 1}'
-
-#### Episodes Recommendation
-
-    curl -X POST http://localhost:3000/ai/episodes \
-    -H "Authorization: Bearer YOUR_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{"characterId": 1}'
-
-#### Chat with Character
-    
-    curl -X POST http://localhost:3000/ai/chat \
-    -H "Authorization: Bearer YOUR_TOKEN" \
-    -H "Content-Type: application/json" \
-    -d '{"characterId": 1, "message": "How's your school, Morty?"}'
+## Environment Configuration
+- **DATABASE_URL**: PostgreSQL connection string
+- **JWT_SECRET**: Secret key for JWT token signing
+- **GITHUB_TOKEN**: Authentication token for GitHub's AI model service
+- **PORT**: Server port configuration (defaults to 5000)

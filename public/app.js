@@ -40,10 +40,10 @@ document.getElementById("searchBtn")?.addEventListener("click", async () => {
             <p><strong>Gender:</strong> ${capitalizeWords(c.gender) || "Unknown"}</p>
             <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
             
-            <button class="backstory-btn" data-id="api-${c.id}">Generate Backstory</button>
-            <button class="chat-btn" data-id="api-${c.id}" data-name="${capitalizeWords(c.name)}">Chat with Character</button>
-            <button class="analyze-btn" data-id="api-${c.id}">Analyze Personality</button>
-            <button class="suggest-relationship-btn" data-id="api-${c.id}">Suggest Relationships</button>
+            <button class="backstory-btn" data-id="api-${c.id}" data-type="external" data-character='${JSON.stringify(c)}'>Generate Backstory</button>
+            <button class="chat-btn" data-id="api-${c.id}" data-name="${capitalizeWords(c.name)}" data-type="external" data-character='${JSON.stringify(c)}'>Chat with Character</button>
+            <button class="analyze-btn" data-id="api-${c.id}" data-type="external" data-character='${JSON.stringify(c)}'>Analyze Personality</button>
+            <button class="relationship-btn" data-id="api-${c.id}" data-type="external" data-character='${JSON.stringify(c)}'>Suggest Relationships</button>
 
 
             <div id="chat-container-api-${c.id}" class="chat-container" style="display:none; margin-top:10px;">
@@ -152,12 +152,12 @@ async function loadCharacters() {
             <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
             <p><strong>Backstory:</strong> <span id="backstory-${c.id}">${c.backstory || "No backstory yet"}</span></p>
             
-            <button class="backstory-btn" data-id="${c.id}" ${hasBackstory ? "disabled" : ""} >
+            <button class="backstory-btn" data-id="${c.id}" data-type="database" data-character='${JSON.stringify(c)}' ${hasBackstory ? "disabled" : ""} >
                 ${hasBackstory ? "Backstory Generated" : "Generate Backstory"}
             </button>
-            <button class="chat-btn" data-id="${c.id}" data-name="${capitalizeWords(c.name)}">Chat with Character</button>
-            <button class="analyze-btn" data-id="${c.id}">Analyze Personality</button>
-            <button class="relationship-btn" data-name="${capitalizeWords(c.name)}">Suggest Relationships</button>
+            <button class="chat-btn" data-id="${c.id}" data-name="${capitalizeWords(c.name)}" data-type="database" data-character='${JSON.stringify(c)}'>Chat with Character</button>
+            <button class="analyze-btn" data-id="${c.id}" data-type="database" data-character='${JSON.stringify(c)}'>Analyze Personality</button>
+            <button class="relationship-btn" data-name="${capitalizeWords(c.name)}" data-type="database" data-character='${JSON.stringify(c)}'>Suggest Relationships</button>
 
 
             <div id="chat-container-${c.id}" class="chat-container" style="display:none; margin-top:10px;">
@@ -209,31 +209,174 @@ document.getElementById("charForm")?.addEventListener("submit", async (e) => {
 
 
 
+// Helper function to handle backstory generation for both character types
+async function handleBackstoryGeneration(button) {
+    const characterId = button.dataset.id;
+    const characterType = button.dataset.type;
+    const characterData = JSON.parse(button.dataset.character);
+    const token = localStorage.getItem("token");
+
+    button.disabled = true;
+    button.innerText = "Generating...";
+
+    try {
+        let res;
+        if (characterType === "database") {
+            // For database characters, use existing endpoint
+            res = await fetch(`${API_URL}/ai/backstory`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ characterId }),
+            });
+        } else {
+            // For external characters, use external endpoint with character data
+            res = await fetch(`${API_URL}/ai/backstory/external`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ 
+                    characterData: {
+                        name: characterData.name,
+                        species: characterData.species,
+                        status: characterData.status,
+                        gender: characterData.gender,
+                        origin: characterData.origin?.name || characterData.origin
+                    }
+                }),
+            });
+        }
+
+        const data = await res.json();
+        if (characterType === "database") {
+            document.getElementById(`backstory-${characterId}`).innerText = data.backstory;
+            button.disabled = true;
+            button.innerText = "Backstory Generated";
+        } else {
+            // For external characters, display in alert
+            alert(`Backstory for ${characterData.name}:\n\n${data.backstory}`);
+            button.disabled = false;
+            button.innerText = "Generate Backstory";
+        }
+    } catch (err) {
+        console.error("Backstory generation failed:", err);
+        button.disabled = false;
+        button.innerText = "Generate Backstory";
+        alert("Failed to generate backstory. Please try again.");
+    }
+}
+
+// Helper function to handle personality analysis for both character types
+async function handlePersonalityAnalysis(button) {
+    const characterId = button.dataset.id;
+    const characterType = button.dataset.type;
+    const characterData = JSON.parse(button.dataset.character);
+    const token = localStorage.getItem("token");
+
+    const analysisDiv = document.getElementById(`analysis-${characterId}`);
+    if (analysisDiv) analysisDiv.innerHTML = "<em>Analyzing personality...</em>";
+
+    try {
+        let res;
+        if (characterType === "database") {
+            res = await fetch(`${API_URL}/ai/personality`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ characterId }),
+            });
+        } else {
+            res = await fetch(`${API_URL}/ai/personality/external`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ 
+                    characterData: {
+                        name: characterData.name,
+                        species: characterData.species,
+                        status: characterData.status,
+                        gender: characterData.gender,
+                        origin: characterData.origin?.name || characterData.origin
+                    }
+                }),
+            });
+        }
+
+        const data = await res.json();
+        if (analysisDiv && data.personality) {
+            analysisDiv.innerHTML = `<pre>${data.personality}</pre>`;
+        } else if (data.personality) {
+            alert(`Personality Analysis for ${characterData.name}:\n\n${data.personality}`);
+        } else {
+            throw new Error("No personality data received");
+        }
+    } catch (err) {
+        console.error("Personality analysis failed:", err);
+        if (analysisDiv) {
+            analysisDiv.innerHTML = `<span style="color:red;">Failed to analyze personality.</span>`;
+        } else {
+            alert("Failed to analyze personality. Please try again.");
+        }
+    }
+}
+
+// Helper function to handle chat for both character types
+async function handleCharacterChat(characterId, characterType, characterData, message) {
+    const token = localStorage.getItem("token");
+    const messagesDiv = document.getElementById(`chat-messages-${characterId}`);
+
+    try {
+        let res;
+        if (characterType === "database") {
+            res = await fetch(`${API_URL}/ai/chat`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ characterId, message }),
+            });
+        } else {
+            res = await fetch(`${API_URL}/ai/chat/external`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ 
+                    characterData: {
+                        name: characterData.name,
+                        species: characterData.species,
+                        status: characterData.status,
+                        gender: characterData.gender,
+                        origin: characterData.origin?.name || characterData.origin
+                    },
+                    message 
+                }),
+            });
+        }
+
+        const data = await res.json();
+        messagesDiv.innerHTML += `<div><strong>${characterData.name}:</strong> ${data.reply}</div>`;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch (err) {
+        console.error("Chat failed:", err);
+        messagesDiv.innerHTML += `<div style="color:red;"><strong>Error:</strong> Failed to get response</div>`;
+    }
+}
+
 document.addEventListener("click", async (e) => {
     // Backstory button
     if (e.target.classList.contains("backstory-btn")) {
-        const characterId = e.target.dataset.id;
-        const token = localStorage.getItem("token");
-
-
-        e.target.disabled = true;
-        e.target.innerText = "Generating...";
-
-
-        const res = await fetch(`${API_URL}/ai/backstory`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ characterId }),
-        });
-
-
-        const data = await res.json();
-        document.getElementById(`backstory-${characterId}`).innerText = data.backstory;
-        e.target.disabled = false;
-        e.target.innerText = "Generate Backstory";
+        await handleBackstoryGeneration(e.target);
     }
 
 
@@ -249,94 +392,57 @@ document.addEventListener("click", async (e) => {
     if (e.target.id.startsWith("chat-send-")) {
         const characterId = e.target.id.replace("chat-send-", "");
         const chatButton = document.querySelector(`.chat-btn[data-id='${characterId}']`);
-        const characterName = chatButton.dataset.name;
-
+        const characterType = chatButton.dataset.type;
+        const characterData = JSON.parse(chatButton.dataset.character);
 
         const input = document.getElementById(`chat-input-${characterId}`);
         const messagesDiv = document.getElementById(`chat-messages-${characterId}`);
         const message = input.value.trim();
         if (!message) return;
 
-
-        const token = localStorage.getItem("token");
         messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
         input.value = "";
 
-
-        const res = await fetch(`${API_URL}/ai/chat`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ characterId, message }),
-        });
-
-
-        const data = await res.json();
-        messagesDiv.innerHTML += `<div><strong>${characterName}:</strong> ${data.reply}</div>`;
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        await handleCharacterChat(characterId, characterType, characterData, message);
     }
 
 
     // Analyze personality button
     if (e.target.classList.contains("analyze-btn")) {
-        const characterId = e.target.dataset.id;
-        const analysisDiv = document.getElementById(`analysis-${characterId}`);
+        await handlePersonalityAnalysis(e.target);
+    }
+    // Suggest Relationships
+    if (e.target.classList.contains("relationship-btn")) {
+        const characterType = e.target.dataset.type;
+        const characterData = JSON.parse(e.target.dataset.character);
+        const char1Name = characterData.name;
+        const otherName = prompt(`Enter another character name to compare with ${char1Name}:`);
+        if (!otherName) return;
+
         const token = localStorage.getItem("token");
 
+        // For now, relationships only work with database characters
+        // So we'll inform the user if they try with external characters
+        if (characterType === "external") {
+            alert("Relationship analysis is currently only available for your saved characters. Please create and save characters first to use this feature.");
+            return;
+        }
 
-        analysisDiv.innerHTML = "<em>Analyzing personality...</em>";
-
-
-        try {
-        const res = await fetch(`${API_URL}/ai/personality`, {
+        const res = await fetch(`${API_URL}/ai/relationships`, {
             method: "POST",
             headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ characterId }),
+            body: JSON.stringify({ char1Name, char2Name: otherName }),
         });
+
         const data = await res.json();
-
-
-        if (data.personality) {
-            analysisDiv.innerHTML = `<pre>${data.personality}</pre>`;
+        if (data.relationship) {
+            alert(`Relationship between ${data.char1} and ${data.char2}:\n\n${data.relationship} (similarity: ${data.similarity})`);
         } else {
-            analysisDiv.innerHTML = `<span style="color:red;">Error analyzing personality.</span>`;
+            alert(data.error || "Error finding relationship.");
         }
-        } catch (err) {
-        analysisDiv.innerHTML = `<span style="color:red;">Failed to fetch analysis.</span>`;
-        }
-    }
-    // Suggest Relationships
-    if (e.target.classList.contains("relationship-btn")) {
-    const char1Name = e.target.dataset.name;
-    const otherName = prompt(`Enter another character name to compare with ${char1Name}:`);
-    if (!otherName) return;
-
-
-    const token = localStorage.getItem("token");
-    const resultDiv = document.getElementById(`relationships-${e.target.closest(".character-card").querySelector("h3").innerText.toLowerCase()}`);
-
-
-    const res = await fetch(`${API_URL}/ai/relationships`, {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ char1Name, char2Name: otherName }),
-    });
-
-
-    const data = await res.json();
-    if (data.relationship) {
-        alert(`Relationship between ${data.char1} and ${data.char2}:\n\n${data.relationship} (similarity: ${data.similarity})`);
-    } else {
-        alert(data.error || "Error finding relationship.");
-    }
     }
 
 
