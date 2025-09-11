@@ -16,15 +16,13 @@
 ## 📦 Setup
 #### 1. Clone repo:
 
-   git clone https://github.com/jay-tun/Rick-and-Morty-API.git
-   cd Rick-and-Morty-API
-   
+    git clone https://github.com/jay-tun/Rick-and-Morty-API.git
+    cd Rick-and-Morty-API
 
 #### 2. Install dependencies:
 
     npm install
     
-
 #### 3. Configure `.env`:
     
     DATABASE_URL=postgresql://postgres:[password]@host:5432/postgres
@@ -53,14 +51,12 @@
     created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW()
     );
-    
 
 ---
 
 ## ▶️ Run server
 
     npm run start
-    
 
 Or in dev mode after installing `npm install nodemon` (Recommended)
 
@@ -77,7 +73,6 @@ The API will be available at http://localhost:3000.
     curl -X POST http://localhost:3000/auth/register \
     -H "Content-Type: application/json" \
     -d '{"email":"test@test.com","password":"123"}'
-    
 
 #### Login
     
@@ -93,7 +88,6 @@ Copy the `token` from response.
     -H "Authorization: Bearer YOUR_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"characterId": 1}'
-    
 
 #### Chat with Character
     
@@ -101,4 +95,3 @@ Copy the `token` from response.
     -H "Authorization: Bearer YOUR_TOKEN" \
     -H "Content-Type: application/json" \
     -d '{"characterId": 1, "message": "How's your school, Morty?"}'
-    
