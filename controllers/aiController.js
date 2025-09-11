@@ -147,7 +147,7 @@ const analyzePersonality = async (req, res) => {
                     Also provide an overall personality summary that captures their essence in the Rick and Morty universe.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: model,
       messages: [
         {
           role: "system",
@@ -183,7 +183,7 @@ const recommendEpisodes = async (req, res) => {
                     Backstory: ${char.backstory}`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: model,
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
     });
@@ -216,7 +216,7 @@ const chatAsCharacter = async (req, res) => {
                           Respond in a witty and in-character way, maximum 2 sentences.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: model,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message },
