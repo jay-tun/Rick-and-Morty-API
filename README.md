@@ -16,7 +16,7 @@
 ## 📦 Setup
 1. Clone repo:
    ```
-   git clone httphttps://github.com/jay-tun/Rick-and-Morty-API.git
+   git clone https://github.com/jay-tun/Rick-and-Morty-API.git
    cd Rick-and-Morty-API
    ```
 
@@ -59,14 +59,43 @@
 
 ## ▶️ Run server
 
-```
-npm run start
-```
+    ```
+    npm run start
+    ```
 
 Or in dev mode after installing `npm install nodemon` (Recommended)
 
-```
-npm run dev
-```
+    ```
+    npm run dev
+    ```
 
 The API will be available at http://localhost:3000.
+
+---
+
+## 🔍 Test API
+
+# Register
+    ```
+    curl -X POST http://localhost:3000/auth/register \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@test.com","password":"123"}'
+    ```
+
+# Login
+    ```
+    curl -X POST http://localhost:3000/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@test.com","password":"123"}'
+    ```
+
+Copy the `token` from response.
+
+# Generate Backstory
+
+    ```
+    curl -X POST http://localhost:3000/ai/backstory \
+    -H "Authorization: Bearer YOUR_TOKEN" \
+    -H "Content-Type: application/json" \
+    -d '{"characterId": 1}'
+    ```
