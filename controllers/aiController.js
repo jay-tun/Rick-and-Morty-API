@@ -61,19 +61,25 @@ const suggestRelationships = async (req, res) => {
     if (!char1Name || !char2Name)
       return res.status(400).json({ error: "Need two character IDs" });
 
-    const res1 = await pool.query("SELECT * FROM characters WHERE id = $1", [
-      char1Name,
-    ]);
-    const res2 = await pool.query("SELECT * FROM characters WHERE id = $1", [
-      char2Name,
-    ]);
-    if (!res1.rows[0] || !res2.rows[0])
+    const res1 = await pool.query(
+      "SELECT * FROM characters WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [char1Name]
+    );
+    const res2 = await pool.query(
+      "SELECT * FROM characters WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [char2Name]
+    );
+
+    const char1 = res1.rows[0];
+    const char2 = res2.rows[0];
+
+    if (!char1 || !char2)
       return res
         .status(404)
         .json({ error: "One or both characters not found" });
 
-    const text1 = `${res1.rows[0].name} ${res1.rows[0].species} ${res1.rows[0].backstory || ""}`;
-    const text2 = `${res2.rows[0].name} ${res2.rows[0].species} ${res2.rows[0].backstory || ""}`;
+    const text1 = `${char1.name}, ${char1.species}, ${char1.backstory || ""}`;
+    const text2 = `${char2.name}, ${char2.species}, ${char2.backstory || ""}`;
 
     const [embed1, embed2] = await Promise.all([
       openai.embeddings.create({
