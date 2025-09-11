@@ -20,3 +20,93 @@ input, button {
   margin: 5px 0;
   padding: 8px;
 }
+
+/* Container for all character cards */
+.character-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* space between cards */
+}
+
+/* Individual character card */
+.character-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  width: 250px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.character-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+
+.character-card h3 {
+  margin: 0 0 5px;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+.character-card p {
+  margin: 3px 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.character-card strong {
+  color: #2c3e50;
+}
+
+.character-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* spacing between cards */
+}
+
+.character-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  width: 250px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.character-card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+
+.character-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2c3e50;
+  text-transform: capitalize; /* capitalizes first letter of each word */
+}
+
+.character-card p {
+  margin: 3px 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.character-card strong {
+  color: #2c3e50;
+}

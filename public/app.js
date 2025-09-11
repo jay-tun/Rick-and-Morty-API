@@ -37,22 +37,52 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
   }
 });
 
+function capitalizeWords(str) {
+  if (!str) return "";
+  return str
+    .split(" ")
+    .map((w) => w[0]?.toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
+
 // Fetch Characters
 async function loadCharacters() {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_URL}/characters`, {
-        headers: { Authorization: `Bearer ${token}` }, // <- include JWT
-    });
-    const data = await res.json();
-    const list = document.getElementById("characterList");
-    if (list) {
-        list.innerHTML = "";
-        data.characters.forEach((c) => {
-        const li = document.createElement("li");
-        li.textContent = `${c.name} (${c.species})`;
-        list.appendChild(li);
-        });
-  }
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  const res = await fetch(`${API_URL}/characters`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json();
+
+  const container = document.getElementById("characterContainer");
+  if (!container) return;
+
+  container.innerHTML = ""; // clear previous content
+
+  data.characters.forEach((c) => {
+    const card = document.createElement("div");
+    card.className = "character-card";
+
+    card.innerHTML = `
+    ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ''}
+    <h3>${capitalizeWords(c.name)}</h3>
+    <p><strong>Species:</strong> ${capitalizeWords(c.species) || "Unknown"}</p>
+    <p><strong>Origin:</strong> ${capitalizeWords(c.origin) || "Unknown"}</p>
+    <p><strong>Gender:</strong> ${capitalizeWords(c.gender) || "Unknown"}</p>
+    <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
+    <p><strong>Backstory:</strong> <span id="backstory-${c.id}">${c.backstory || "No backstory yet"}</span></p>
+    <button class="backstory-btn" data-id="${c.id}">Generate Backstory</button>
+    <button class="chat-btn" data-id="${c.id}">Chat with Character</button>
+    <div id="chat-container-${c.id}" class="chat-container" style="display:none; margin-top:10px;">
+      <div id="chat-messages-${c.id}" class="chat-messages" style="border:1px solid #ccc; padding:5px; height:100px; overflow-y:auto; margin-bottom:5px;"></div>
+      <input type="text" id="chat-input-${c.id}" placeholder="Say something..." style="width:70%; padding:5px;">
+      <button id="chat-send-${c.id}">Send</button>
+    </div>
+  `;
+
+    container.appendChild(card);
+  });
 }
 
 
@@ -81,6 +111,63 @@ document.getElementById("charForm")?.addEventListener("submit", async (e) => {
   const data = await res.json();
   alert("Character created!");
   loadCharacters();
+});
+
+
+document.addEventListener("click", async (e) => {
+  if (e.target.classList.contains("backstory-btn")) {
+    const characterId = e.target.dataset.id;
+    const token = localStorage.getItem("token");
+
+    e.target.disabled = true;
+    e.target.innerText = "Generating...";
+
+    const res = await fetch(`${API_URL}/ai/backstory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ characterId }),
+    });
+
+    const data = await res.json();
+    document.getElementById(`backstory-${characterId}`).innerText = data.backstory;
+    e.target.disabled = false;
+    e.target.innerText = "Generate Backstory";
+  }
+  // Chat button
+  if (e.target.classList.contains("chat-btn")) {
+    const characterId = e.target.dataset.id;
+    const chatContainer = document.getElementById(`chat-container-${characterId}`);
+    chatContainer.style.display = chatContainer.style.display === "none" ? "block" : "none";
+  }
+
+  // Send chat message
+  if (e.target.id.startsWith("chat-send-")) {
+    const characterId = e.target.id.replace("chat-send-", "");
+    const input = document.getElementById(`chat-input-${characterId}`);
+    const messagesDiv = document.getElementById(`chat-messages-${characterId}`);
+    const message = input.value.trim();
+    if (!message) return;
+
+    const token = localStorage.getItem("token");
+    messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
+    input.value = "";
+
+    const res = await fetch(`${API_URL}/ai/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ characterId, message }),
+    });
+
+    const data = await res.json();
+    messagesDiv.innerHTML += `<div><strong>${capitalizeWords(characterId)}:</strong> ${data.reply}</div>`;
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
 });
 
 // Logout
