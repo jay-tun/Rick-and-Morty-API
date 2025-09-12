@@ -40,8 +40,6 @@ document.getElementById("searchBtn")?.addEventListener("click", async () => {
             <button class="analyze-btn" data-id="api-${c.id}">Analyze Personality</button>
             <button class="suggest-relationship-btn" data-id="api-${c.id}">Suggest Relationships</button>
             <button class="recommend-btn" data-id="${c.id}" data-type="database" data-character='${JSON.stringify(c)}'>
-            <button class="update-btn" data-id="${c.id}">Update Character</button>
-            <button class="delete-btn" data-id="${c.id}">Remove Character</button>
             Recommend Episodes
             </button>
             <div id="recommend-${c.id}" class="recommend-box" style="margin-top:10px;"></div>
@@ -150,6 +148,8 @@ async function loadCharacters() {
             <button class="recommend-btn" data-id="${c.id}" data-type="database" data-character='${JSON.stringify(c)}'>
             Recommend Episodes
             </button>
+            <button class="update-btn btn btn-secondary" data-id="${c.id}">✏️ Update</button>
+            <button class="delete-btn btn" data-id="${c.id}" style="background: var(--alien-pink); color: white;">🗑️ Delete</button>
             <div id="recommend-${c.id}" class="recommend-box" style="margin-top:10px;"></div>
 
 
@@ -361,7 +361,6 @@ document.addEventListener("click", async (e) => {
                 container.innerHTML = `<span style="color:red;">Error fetching recommendations</span>`;
             });
     }
-
     // Remove character
     if (e.target.classList.contains("delete-btn")) {
         const characterId = e.target.dataset.id;
@@ -382,7 +381,7 @@ document.addEventListener("click", async (e) => {
         }
     }
 
-    // ✏️ Update character
+    //  Update character
     if (e.target.classList.contains("update-btn")) {
         const characterId = e.target.dataset.id;
         const token = localStorage.getItem("token");

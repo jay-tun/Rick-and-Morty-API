@@ -7,6 +7,6 @@ router.get("/", auth, characterController.getAll); //protected
 router.get("/:id", auth, characterController.getById); //protected
 router.post("/", auth, characterController.create); //protected
 router.put("/:id", auth, characterController.update); //protected
-router.delete("/", auth, characterController.remove); //protected
+router.delete("/:id", auth, characterController.remove); //protected
 
 module.exports = router;
