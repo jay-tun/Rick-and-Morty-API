@@ -2,25 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rick & Morty Characters</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rick & Morty Character Lab</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Characters</h1>
-  <button onclick="logout()">Logout</button>
+  <div class="container">
+    <div class="header">
+      <h1 class="page-title">🧪 Your Character Laboratory 🧪</h1>
+      <p class="page-subtitle">"Science isn't a democracy, *burp* but character creation kind of is!"</p>
+      <button onclick="logout()" class="btn btn-logout">🚪 Logout (Return to C-137)</button>
+    </div>
 
-  <h2>Add Character</h2>
-  <form id="charForm">
-    <input type="text" id="name" placeholder="Name" required>
-    <input type="text" id="species" placeholder="Species">
-    <input type="text" id="status" placeholder="Status">
-    <input type="text" id="gender" placeholder="Gender">
-    <input type="text" id="origin" placeholder="Origin">
-    <button type="submit">Add Character</button>
-  </form>
+    <div class="character-creation-section">
+      <h2>⚗️ Create New Character</h2>
+      <p class="section-description">Design your own Rick & Morty universe character! Don't worry if it's weird - we've seen weirder.</p>
+      <form id="charForm" class="character-form">
+        <div class="form-row">
+          <input type="text" id="name" placeholder="Character Name (be creative, unlike Jerry)" required>
+          <input type="text" id="species" placeholder="Species (Human, Alien, Cronenberg, etc.)">
+        </div>
+        <div class="form-row">
+          <select id="status" required>
+            <option value="">Select Status</option>
+            <option value="Alive">Alive (for now)</option>
+            <option value="Dead">Dead (happens a lot)</option>
+            <option value="unknown">Unknown (Schrödinger's character)</option>
+          </select>
+          <select id="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Genderless">Genderless</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <input type="text" id="origin" placeholder="Origin (Planet, Dimension, Jerry's garage, etc.)">
+        <button type="submit" class="btn btn-primary">🚀 Create Character</button>
+      </form>
+    </div>
 
-  <h2>Character List</h2>
-  <ul id="characterList"></ul>
-  <div id="characterContainer"></div>
+    <div class="characters-section">
+      <h2>👥 Your Character Collection</h2>
+      <p class="section-description">Your custom characters appear here. Use the AI features to bring them to life!</p>
+      <div id="characterContainer" class="characters-grid"></div>
+      <div id="characterList" style="display: none;"></div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

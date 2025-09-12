@@ -1,47 +1,40 @@
 const API_URL = window.location.hostname.includes("localhost")
-  ? "http://localhost:3000"
-  : "https://rick-and-morty-api-oh0e.onrender.com";
- 
+    ? "http://localhost:3000"
+    : "https://rick-and-morty-api-oh0e.onrender.com";
 
 document.getElementById("searchBtn")?.addEventListener("click", async () => {
     const name = document.getElementById("searchName").value.trim();
     const species = document.getElementById("searchSpecies").value.trim();
 
-
     if (!name && !species) return alert("Enter name or species to search");
-
 
     const container = document.getElementById("rick-character-results");
     container.innerHTML = "<em>Searching...</em>";
 
-
     try {
         const res = await fetch(
-        `${API_URL}/external/search?name=${encodeURIComponent(name)}&species=${encodeURIComponent(species)}`
+            `${API_URL}/external/search?name=${encodeURIComponent(name)}&species=${encodeURIComponent(species)}`,
         );
         const data = await res.json();
 
-
         if (!data.results || data.results.length === 0) {
-        container.innerHTML = "<p>No characters found</p>";
-        return;
+            container.innerHTML = "<p>No characters found</p>";
+            return;
         }
-
 
         container.innerHTML = "";
         data.results.forEach((c) => {
-        const card = document.createElement("div");
-        card.className = "character-card";
+            const card = document.createElement("div");
+            card.className = "character-card";
 
-
-        card.innerHTML = `
-            ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ''}
+            card.innerHTML = `
+            ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ""}
             <h3>${capitalizeWords(c.name)}</h3>
             <p><strong>Species:</strong> ${capitalizeWords(c.species) || "Unknown"}</p>
             <p><strong>Origin:</strong> ${capitalizeWords(c.origin.name) || "Unknown"}</p>
             <p><strong>Gender:</strong> ${capitalizeWords(c.gender) || "Unknown"}</p>
             <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
-            
+
             <button class="backstory-btn" data-id="api-${c.id}">Generate Backstory</button>
             <button class="chat-btn" data-id="api-${c.id}" data-name="${capitalizeWords(c.name)}">Chat with Character</button>
             <button class="analyze-btn" data-id="api-${c.id}">Analyze Personality</button>
@@ -58,40 +51,37 @@ document.getElementById("searchBtn")?.addEventListener("click", async () => {
             </div>
         `;
 
-
-        container.appendChild(card);
+            container.appendChild(card);
         });
     } catch (err) {
         console.error(err);
-        container.innerHTML = "<span style='color:red;'>Failed to fetch characters.</span>";
+        container.innerHTML =
+            "<span style='color:red;'>Failed to fetch characters.</span>";
     }
 });
 
-
-
 // 🔑 Register
-document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("registerEmail").value;
-    const password = document.getElementById("registerPassword").value;
+document
+    .getElementById("registerForm")
+    ?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("registerEmail").value;
+        const password = document.getElementById("registerPassword").value;
 
-
-    const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        const res = await fetch(`${API_URL}/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        document.getElementById("message").innerText = JSON.stringify(data);
     });
-    const data = await res.json();
-    document.getElementById("message").innerText = JSON.stringify(data);
-});
-
 
 // Login
 document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
-
 
     const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
@@ -100,16 +90,15 @@ document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     });
     const data = await res.json();
 
-
     if (data.token) {
         localStorage.setItem("token", data.token);
         window.location.href = "characters.html";
     } else {
         // show either error or message
-        document.getElementById("message").innerText = data.error || data.message || "Login failed!";
+        document.getElementById("message").innerText =
+            data.error || data.message || "Login failed!";
     }
 });
-
 
 function capitalizeWords(str) {
     if (!str) return "";
@@ -119,44 +108,37 @@ function capitalizeWords(str) {
         .join(" ");
 }
 
-
 // Fetch Characters
 async function loadCharacters() {
     const token = localStorage.getItem("token");
     if (!token) return;
-
 
     const res = await fetch(`${API_URL}/characters`, {
         headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
 
-
     const container = document.getElementById("characterContainer");
     if (!container) return;
 
-
     container.innerHTML = ""; // clear previous content
-
 
     data.characters.forEach((c) => {
         const card = document.createElement("div");
         card.className = "character-card";
 
-
         // check if already has backstory
         const hasBackstory = !!c.backstory;
 
-
         card.innerHTML = `
-            ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ''}
+            ${c.image ? `<img src="${c.image}" alt="${capitalizeWords(c.name)}">` : ""}
             <h3>${capitalizeWords(c.name)}</h3>
             <p><strong>Species:</strong> ${capitalizeWords(c.species) || "Unknown"}</p>
             <p><strong>Origin:</strong> ${capitalizeWords(c.origin) || "Unknown"}</p>
             <p><strong>Gender:</strong> ${capitalizeWords(c.gender) || "Unknown"}</p>
             <p><strong>Status:</strong> ${capitalizeWords(c.status) || "Unknown"}</p>
             <p><strong>Backstory:</strong> <span id="backstory-${c.id}">${c.backstory || "No backstory yet"}</span></p>
-            
+
             <button class="backstory-btn" data-id="${c.id}" ${hasBackstory ? "disabled" : ""} >
                 ${hasBackstory ? "Backstory Generated" : "Generate Backstory"}
             </button>
@@ -180,43 +162,36 @@ async function loadCharacters() {
             <div id="relationships-${c.id}" class="relationships-box" style="margin-top:10px;"></div>
         `;
 
-
         container.appendChild(card);
     });
 }
 
-
-
 if (document.getElementById("characterList")) loadCharacters();
-
 
 // Add Character
 document.getElementById("charForm")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("token");
-  const body = {
-    name: document.getElementById("name").value,
-    species: document.getElementById("species").value,
-    status: document.getElementById("status").value,
-    gender: document.getElementById("gender").value,
-    origin: document.getElementById("origin").value,
-  };
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    const body = {
+        name: document.getElementById("name").value,
+        species: document.getElementById("species").value,
+        status: document.getElementById("status").value,
+        gender: document.getElementById("gender").value,
+        origin: document.getElementById("origin").value,
+    };
 
-
-  const res = await fetch(`${API_URL}/characters`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json();
-  alert("Character created!");
-  loadCharacters();
+    const res = await fetch(`${API_URL}/characters`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    alert("Character created!");
+    loadCharacters();
 });
-
-
 
 document.addEventListener("click", async (e) => {
     // Backstory button
@@ -224,69 +199,67 @@ document.addEventListener("click", async (e) => {
         const characterId = e.target.dataset.id;
         const token = localStorage.getItem("token");
 
-
         e.target.disabled = true;
         e.target.innerText = "Generating...";
 
-
         const res = await fetch(`${API_URL}/ai/backstory`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ characterId }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ characterId }),
         });
 
-
         const data = await res.json();
-        document.getElementById(`backstory-${characterId}`).innerText = data.backstory;
+        document.getElementById(`backstory-${characterId}`).innerText =
+            data.backstory;
         e.target.disabled = false;
         e.target.innerText = "Generate Backstory";
     }
 
-
     // Chat button (toggle chat container)
     if (e.target.classList.contains("chat-btn")) {
         const characterId = e.target.dataset.id;
-        const chatContainer = document.getElementById(`chat-container-${characterId}`);
-        chatContainer.style.display = chatContainer.style.display === "none" ? "block" : "none";
+        const chatContainer = document.getElementById(
+            `chat-container-${characterId}`,
+        );
+        chatContainer.style.display =
+            chatContainer.style.display === "none" ? "block" : "none";
     }
-
 
     // Send chat message
     if (e.target.id.startsWith("chat-send-")) {
         const characterId = e.target.id.replace("chat-send-", "");
-        const chatButton = document.querySelector(`.chat-btn[data-id='${characterId}']`);
+        const chatButton = document.querySelector(
+            `.chat-btn[data-id='${characterId}']`,
+        );
         const characterName = chatButton.dataset.name;
 
-
         const input = document.getElementById(`chat-input-${characterId}`);
-        const messagesDiv = document.getElementById(`chat-messages-${characterId}`);
+        const messagesDiv = document.getElementById(
+            `chat-messages-${characterId}`,
+        );
         const message = input.value.trim();
         if (!message) return;
-
 
         const token = localStorage.getItem("token");
         messagesDiv.innerHTML += `<div><strong>You:</strong> ${message}</div>`;
         input.value = "";
 
-
         const res = await fetch(`${API_URL}/ai/chat`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ characterId, message }),
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ characterId, message }),
         });
-
 
         const data = await res.json();
         messagesDiv.innerHTML += `<div><strong>${characterName}:</strong> ${data.reply}</div>`;
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
-
 
     // Analyze personality button
     if (e.target.classList.contains("analyze-btn")) {
@@ -294,107 +267,102 @@ document.addEventListener("click", async (e) => {
         const analysisDiv = document.getElementById(`analysis-${characterId}`);
         const token = localStorage.getItem("token");
 
-
         analysisDiv.innerHTML = "<em>Analyzing personality...</em>";
 
-
         try {
-        const res = await fetch(`${API_URL}/ai/personality`, {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ characterId }),
-        });
-        const data = await res.json();
+            const res = await fetch(`${API_URL}/ai/personality`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ characterId }),
+            });
+            const data = await res.json();
 
-
-        if (data.personality) {
-            analysisDiv.innerHTML = `<pre>${data.personality}</pre>`;
-        } else {
-            analysisDiv.innerHTML = `<span style="color:red;">Error analyzing personality.</span>`;
-        }
+            if (data.personality) {
+                analysisDiv.innerHTML = `<pre>${data.personality}</pre>`;
+            } else {
+                analysisDiv.innerHTML = `<span style="color:red;">Error analyzing personality.</span>`;
+            }
         } catch (err) {
-        analysisDiv.innerHTML = `<span style="color:red;">Failed to fetch analysis.</span>`;
+            analysisDiv.innerHTML = `<span style="color:red;">Failed to fetch analysis.</span>`;
         }
     }
     // Suggest Relationships
     if (e.target.classList.contains("relationship-btn")) {
         const char1Name = e.target.dataset.name;
-        const otherName = prompt(`Enter another character name to compare with ${char1Name}:`);
+        const otherName = prompt(
+            `Enter another character name to compare with ${char1Name}:`,
+        );
         if (!otherName) return;
 
-
         const token = localStorage.getItem("token");
-        const resultDiv = document.getElementById(`relationships-${e.target.closest(".character-card").querySelector("h3").innerText.toLowerCase()}`);
-
+        const resultDiv = document.getElementById(
+            `relationships-${e.target.closest(".character-card").querySelector("h3").innerText.toLowerCase()}`,
+        );
 
         const res = await fetch(`${API_URL}/ai/relationships`, {
             method: "POST",
             headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ char1Name, char2Name: otherName }),
         });
 
-
         const data = await res.json();
         if (data.relationship) {
-            alert(`Relationship between ${data.char1} and ${data.char2}:\n\n${data.relationship} (similarity: ${data.similarity})`);
+            alert(
+                `Relationship between ${data.char1} and ${data.char2}:\n\n${data.relationship} (similarity: ${data.similarity})`,
+            );
         } else {
             alert(data.error || "Error finding relationship.");
         }
     }
 
     // Recommend episodes
-if (e.target.classList.contains("recommend-btn")) {
-  const characterId = e.target.dataset.id;
-  const characterType = e.target.dataset.type;
-  const characterData = JSON.parse(e.target.dataset.character);
-  const token = localStorage.getItem("token");
+    if (e.target.classList.contains("recommend-btn")) {
+        const characterId = e.target.dataset.id;
+        const characterType = e.target.dataset.type;
+        const characterData = JSON.parse(e.target.dataset.character);
+        const token = localStorage.getItem("token");
 
-  const container = document.getElementById(`recommend-${characterId}`);
-  container.innerHTML = "<em>Finding recommendations...</em>";
+        const container = document.getElementById(`recommend-${characterId}`);
+        container.innerHTML = "<em>Finding recommendations...</em>";
 
-  let body = {};
-  if (characterType === "database") {
-    body = { characterId };
-  } else {
-    body = { characterData };
-  }
+        let body = {};
+        if (characterType === "database") {
+            body = { characterId };
+        } else {
+            body = { characterData };
+        }
 
-  fetch(`${API_URL}/ai/recommend`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.recommendations) {
-        container.innerHTML = `<pre>${data.recommendations}</pre>`;
-      } else {
-        container.innerHTML = `<span style="color:red;">Failed to get recommendations</span>`;
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      container.innerHTML = `<span style="color:red;">Error fetching recommendations</span>`;
-    });
-}
-
-
-
+        fetch(`${API_URL}/ai/recommend`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(body),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.recommendations) {
+                    container.innerHTML = `<pre>${data.recommendations}</pre>`;
+                } else {
+                    container.innerHTML = `<span style="color:red;">Failed to get recommendations</span>`;
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+                container.innerHTML = `<span style="color:red;">Error fetching recommendations</span>`;
+            });
+    }
 });
-
-
 
 // Logout
 function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "index.html";
+    localStorage.removeItem("token");
+    window.location.href = "index.html";
 }

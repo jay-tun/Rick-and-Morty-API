@@ -2,31 +2,83 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rick & Morty App - Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rick & Morty Interdimensional Character Database</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="rick-search-container">
-    <input type="text" id="searchName" placeholder="Search by name">
-    <input type="text" id="searchSpecies" placeholder="Search by species">
-    <button id="searchBtn">Search</button>
+  <div class="hero-section">
+    <img src="rick_morty_hero.png" alt="Rick and Morty Character Database" class="hero-image">
+    <h1 class="hero-title">🛸 Rick & Morty Interdimensional Character Database 🛸</h1>
+    <p class="hero-subtitle">"Wubba Lubba Dub Dub! Welcome to the multiverse, *burp* where infinite possibilities meet questionable life choices!"</p>
   </div>
 
-<div id="rick-character-results" style="margin-top: 20px;"></div>
-  <h1>Login</h1>
-  <form id="loginForm">
-    <input type="email" id="loginEmail" placeholder="Email" required>
-    <input type="password" id="loginPassword" placeholder="Password" required>
-    <button type="submit">Login</button>
-  </form>
+  <div class="container">
+    <div class="intro-section">
+      <h2>🧪 What is this Schwifty Science Project? 🧪</h2>
+      <div class="intro-content">
+        <div class="intro-item">
+          <span class="intro-number">1.</span>
+          <div class="intro-text">
+            <h3>Search the Show's Characters</h3>
+            <p>Use the search function below to find any character from the Rick & Morty multiverse! Search by name or species - because apparently Jerry counts as "Human" <em>*eye roll*</em></p>
+            <p class="disclaimer">⚠️ <strong>Note:</strong> AI features aren't working with show characters yet. Rick's still debugging the quantum flux capacitor... or something. Don't blame us, blame Jerry.</p>
+          </div>
+        </div>
+        <div class="intro-item">
+          <span class="intro-number">2.</span>
+          <div class="intro-text">
+            <h3>Create Your Own Characters</h3>
+            <p>Register an account and unleash your creativity! Design custom Rick & Morty characters and watch our AI analyze them with the precision of Rick's <em>burp</em> genius intellect!</p>
+            <p><strong>AI Features Include:</strong></p>
+            <ul>
+              <li>🤖 Generate backstories (more interesting than Morty's school essays)</li>
+              <li>🧠 Personality analysis using the Big Five traits</li>
+              <li>💬 Chat with your characters (they might be smarter than Jerry)</li>
+              <li>📺 Get episode recommendations where your character might appear</li>
+              <li>❤️ Relationship suggestions between characters</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <h1>Register</h1>
-  <form id="registerForm">
-    <input type="email" id="registerEmail" placeholder="Email" required>
-    <input type="password" id="registerPassword" placeholder="Password" required>
-    <button type="submit">Register</button>
-  </form>
+    <div class="search-section">
+      <h2>🔍 Search Interdimensional Characters</h2>
+      <div class="search-container">
+        <input type="text" id="searchName" placeholder="Character name (e.g., Rick, Morty, Mr. Poopybutthole)">
+        <input type="text" id="searchSpecies" placeholder="Species (e.g., Human, Alien, Cronenberg)">
+        <button id="searchBtn" class="btn btn-primary">🚀 Search the Multiverse</button>
+      </div>
+    </div>
 
-  <p id="message"></p>
+    <div id="rick-character-results" class="results-container"></div>
+
+    <div class="auth-section">
+      <div class="auth-container">
+        <div class="auth-form">
+          <h2>🔐 Login to Your Universe</h2>
+          <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email (no universe prefix needed)" required>
+            <input type="password" id="loginPassword" placeholder="Password (not 'password123')" required>
+            <button type="submit" class="btn btn-secondary">Login</button>
+          </form>
+        </div>
+        
+        <div class="auth-form">
+          <h2>📝 Register New Account</h2>
+          <p class="auth-description">Join the multiverse! Create an account to build custom characters and use AI features.</p>
+          <form id="registerForm">
+            <input type="email" id="registerEmail" placeholder="Email" required>
+            <input type="password" id="registerPassword" placeholder="Password (stronger than Jerry's willpower)" required>
+            <button type="submit" class="btn btn-primary">Register</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="message" class="message"></div>
+  </div>
 
   <script src="app.js"></script>
 </body>
