@@ -40,6 +40,8 @@ document.getElementById("searchBtn")?.addEventListener("click", async () => {
             <button class="analyze-btn" data-id="api-${c.id}">Analyze Personality</button>
             <button class="suggest-relationship-btn" data-id="api-${c.id}">Suggest Relationships</button>
             <button class="recommend-btn" data-id="${c.id}" data-type="database" data-character='${JSON.stringify(c)}'>
+            <button class="update-btn" data-id="${c.id}">Update Character</button>
+            <button class="delete-btn" data-id="${c.id}">Remove Character</button>
             Recommend Episodes
             </button>
             <div id="recommend-${c.id}" class="recommend-box" style="margin-top:10px;"></div>
@@ -359,6 +361,60 @@ document.addEventListener("click", async (e) => {
                 container.innerHTML = `<span style="color:red;">Error fetching recommendations</span>`;
             });
     }
+
+    // Remove character
+    if (e.target.classList.contains("delete-btn")) {
+        const characterId = e.target.dataset.id;
+        const token = localStorage.getItem("token");
+        if (!confirm("Are you sure you want to remove this character?")) return;
+
+        try {
+            const res = await fetch(`${API_URL}/characters/${characterId}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await res.json();
+            alert(data.message || "Character removed!");
+            loadCharacters();
+        } catch (err) {
+            console.error(err);
+            alert("Failed to remove character");
+        }
+    }
+
+    // ✏️ Update character
+    if (e.target.classList.contains("update-btn")) {
+        const characterId = e.target.dataset.id;
+        const token = localStorage.getItem("token");
+
+        // Prompt for new values (quick way, later you can make a proper form)
+        const name = prompt("Enter new name:");
+        const species = prompt("Enter new species:");
+        const origin = prompt("Enter new origin:");
+        const status = prompt("Enter new status:");
+        const gender = prompt("Enter new gender:");
+
+        if (!name && !species && !origin && !status && !gender) return;
+
+        try {
+            const res = await fetch(`${API_URL}/characters/${characterId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ name, species, origin, status, gender }),
+            });
+
+            const data = await res.json();
+            alert(data.message || "Character updated!");
+            loadCharacters();
+        } catch (err) {
+            console.error(err);
+            alert("Failed to update character");
+        }
+    }
+
 });
 
 // Logout

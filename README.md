@@ -1,77 +1,159 @@
-# Overview
+# 🚀 Rick & Morty Interdimensional Character Database
 
-This is a Rick & Morty AI Backend application that combines a RESTful API with AI-powered features. The system allows users to manage custom characters, search the external Rick & Morty API, and interact with AI features like backstory generation, personality analysis, episode recommendations, and character chatbots. Built with Node.js and Express, it features JWT authentication, PostgreSQL database integration, and OpenAI API integration through GitHub's model inference service.
+A full-stack web application that combines the Rick & Morty universe with AI-powered character features. Search characters from the show, create custom characters, and use AI to bring them to life with backstories, personality analysis, and interactive chats!
 
-# User Preferences
+## 🌐 Live Application
+**Access the app at: https://rick-and-morty-api-oh0e.onrender.com**
 
-Preferred communication style: Simple, everyday language.
+## ✨ Features
 
-# System Architecture
+### 🎭 Character Management
+- **Search Show Characters**: Find any character from the Rick & Morty series by name or species
+- **Custom Character Creation**: Design your own Rick & Morty universe characters
+- **User Authentication**: Secure JWT-based login system
 
-## Backend Architecture
-- **Framework**: Express.js with Node.js runtime
-- **Architecture Pattern**: RESTful API with modular route-controller structure
-- **File Organization**: Separated concerns with dedicated folders for routes, controllers, middleware, and database connection
-- **Authentication**: JWT-based stateless authentication with bcrypt password hashing
-- **Middleware**: Custom authentication middleware for protected routes
+### 🤖 AI-Powered Features (Custom Characters Only)
+- **Backstory Generation**: Create detailed character histories
+- **Personality Analysis**: Big Five personality trait analysis
+- **Interactive Chat**: Talk with your characters in their unique voice
+- **Episode Recommendations**: Get suggestions for where your character might appear
+- **Relationship Predictions**: Discover potential character relationships using embeddings
 
-## Database Design
-- **Database**: PostgreSQL with connection pooling via node-postgres (pg)
-- **Schema**: Two main tables - users (authentication) and characters (user-created content)
-- **User Table**: Basic user management with email/password and timestamps
-- **Character Table**: Flexible character storage with optional fields for species, status, gender, origin, image, and AI-generated backstory
-- **Security**: SSL-enabled database connections with environment-based configuration
+### 🎨 Rick & Morty Themed UI
+- **Multiverse Design**: Space-themed gradient backgrounds with portal colors
+- **Show-Accurate Humor**: Interface text written in Rick & Morty style
+- **Responsive Layout**: Works perfectly on desktop and mobile
+- **Character Cards**: Beautiful cards with hover animations and glassmorphism effects
+- **Custom Imagery**: Generated Rick & Morty themed graphics
 
-## API Structure
-- **Authentication Routes** (`/auth`): User registration and login
-- **Character Routes** (`/characters`): CRUD operations for user-created characters (protected)
-- **External API Routes** (`/external`): Proxy to Rick & Morty API for character search
-- **AI Routes** (`/ai`): AI-powered features including backstory generation, personality analysis, and chatbot functionality (protected)
+---
 
-## AI Integration
-- **Provider**: OpenAI models accessed through GitHub's model inference service
-- **Model**: GPT-4.1 for text generation tasks
-- **Features**: Backstory generation, Big Five personality analysis, episode recommendations, relationship predictions, and in-character chatbot interactions
-- **Flexibility**: Supports both user-created characters and external API characters for AI operations
+## 📦 Deployment & Setup
 
-## Frontend Architecture
-- **Technology**: Vanilla JavaScript with HTML/CSS
-- **Structure**: Static file serving from public directory
-- **Pages**: Login/registration page and character management interface
-- **API Communication**: Fetch API for backend communication with JWT token handling
-- **UI Features**: Character search, CRUD operations, and AI feature integration
+### 🚀 Production Deployment (Render)
+The application is currently deployed and running on Render:
+- **Live URL**: https://rick-and-morty-api-oh0e.onrender.com
+- **Auto-deployment**: Connected to GitHub repository for continuous deployment
+- **Environment**: Production-ready with PostgreSQL database
 
-## Security Implementation
-- **Authentication**: JWT tokens with configurable secret
-- **Password Security**: bcrypt hashing with salt rounds
-- **Route Protection**: Middleware-based authentication for sensitive endpoints
-- **CORS**: Enabled for cross-origin requests
-- **Input Validation**: Basic validation for required fields and data types
+### 🛠️ Local Development Setup
 
-# External Dependencies
+#### 1. Environment Configuration
+Create a `.env` file with the following variables:
 
-## Core Backend Dependencies
-- **express**: Web framework for API routing and middleware
-- **pg**: PostgreSQL client for database operations with connection pooling
-- **jsonwebtoken**: JWT token generation and verification for authentication
-- **bcrypt**: Password hashing and verification
-- **cors**: Cross-origin resource sharing middleware
-- **dotenv**: Environment variable management
+```env
+DATABASE_URL=postgresql://[your-database-url]
+JWT_SECRET=[your-jwt-secret]
+GITHUB_TOKEN=[your-github-token]
+PORT=3000
+```
 
-## AI and External Services
-- **openai**: OpenAI SDK configured to use GitHub's model inference service
-- **axios**: HTTP client for external API requests to Rick & Morty API
+#### 2. Database Setup
+PostgreSQL database with the following schema:
 
-## Database Service
-- **PostgreSQL**: Primary database, configured for Supabase hosting
-- **Connection**: SSL-enabled connection with environment-based configuration
+```sql
+-- Users table for authentication
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 
-## External APIs
-- **Rick & Morty API**: Public API for character data at rickandmortyapi.com
-- **GitHub Models API**: AI model inference service using OpenAI GPT-4.1
+-- Characters table for custom character storage
+CREATE TABLE characters (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  species TEXT,
+  status TEXT,
+  gender TEXT,
+  origin TEXT,
+  image TEXT,
+  backstory TEXT,
+  created_by INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
 
-## Environment Configuration
-- **DATABASE_URL**: PostgreSQL connection string
-- **JWT_SECRET**: Secret key for JWT token signing
-- **GITHUB_TOKEN**: Authentication token for GitHub's AI model service
-- **PORT**: Server port configuration (defaults to 5000)
+#### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+#### 4. Start Development Server
+
+```bash
+npm start
+# or for development with auto-reload
+npm run dev
+```
+
+### 📋 Dependencies
+
+```json
+{
+  "express": "Web framework",
+  "pg": "PostgreSQL client", 
+  "jsonwebtoken": "JWT authentication",
+  "bcrypt": "Password hashing",
+  "openai": "AI integration via GitHub Models",
+  "axios": "HTTP requests",
+  "cors": "Cross-origin requests",
+  "dotenv": "Environment variables"
+}
+```
+
+---
+
+## 🌐 Using the Web Interface
+
+### Landing Page (https://rick-and-morty-api-oh0e.onrender.com)
+1. **Character Search**: Use the search bar to find Rick & Morty show characters
+2. **User Registration**: Create a new account to access custom character features
+3. **Login**: Sign in to manage your custom characters
+
+### Character Lab (`/characters.html`)
+1. **Create Characters**: Fill out the character creation form
+2. **View Collection**: See all your custom characters in beautiful cards
+3. **AI Features**: Use the buttons on each character card to:
+   - Generate backstories
+   - Analyze personality
+   - Chat with characters
+   - Get episode recommendations
+   - Discover relationships
+
+---
+
+## 🏗️ Architecture
+
+- **Backend**: Node.js + Express.js RESTful API
+- **Database**: PostgreSQL with connection pooling
+- **Authentication**: JWT tokens with bcrypt password hashing
+- **AI Integration**: OpenAI GPT-4 via GitHub Models API
+- **Frontend**: Vanilla JavaScript with Rick & Morty themed CSS
+- **External API**: Rick & Morty API proxy for character search
+- **Deployment**: Production deployment on Render with auto-deploy from GitHub
+
+---
+
+## 🎯 Current Status
+
+- ✅ **Styled Frontend**: Complete Rick & Morty themed UI
+- ✅ **Character Search**: Working with Rick & Morty API
+- ✅ **User Authentication**: Fully functional
+- ✅ **Custom Characters**: Create, read, update, delete
+- ✅ **AI Features**: Working for custom characters only
+- ⚠️ **AI + Show Characters**: Currently disabled (in development)
+
+---
+
+## 🚨 Known Issues
+
+- AI features (backstory, personality, chat, etc.) only work with custom user-created characters
+- Show characters from the Rick & Morty API cannot use AI features yet
+- This limitation is clearly communicated in the user interface
+
+---
+
+*"Wubba Lubba Dub Dub! Science isn't about why, it's about why not!" - Rick Sanchez*
